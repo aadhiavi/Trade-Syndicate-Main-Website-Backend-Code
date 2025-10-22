@@ -15,7 +15,7 @@ async function sendToAI(prompt) {
     }, {
         headers: {
             Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
-            'HTTP-Referer': 'http://localhost:5000',
+            'HTTP-Referer': 'http://tradesyndicate.in',
             'Content-Type': 'application/json'
         }
     });

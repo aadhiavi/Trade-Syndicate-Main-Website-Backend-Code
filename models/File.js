@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 const FileSchema = new Schema({
     userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     originalName: { type: String, required: true },
-    filename: { type: String, required: true },   // stored filename
+    filename: { type: String, required: true },
     mimetype: { type: String, required: true },
     size: { type: Number, required: true },
     folderId: { type: Schema.Types.ObjectId, ref: 'Folder', default: null },

@@ -3,9 +3,7 @@ const { handleFormSubmission, getForms, deleteForm, editForm } = require('./cont
 const router = express.Router();
 
 router.post('/contact', handleFormSubmission);
-
 router.get('/contacts', getForms);
-
 router.delete('/contact/:id', deleteForm);
 router.put('/contact/:id', editForm);
 
