@@ -1,0 +1,310 @@
+{
+  "company": {
+    "name": "Trade Syndicate",
+    "location": "Kharkhana, Hyderabad",
+    "address": "Plot No 128, Gate Number 6, Sitaram Nagar, Gunrock Enclave, Secunderabad, Telangana 500009",
+    "contact": {
+      "phone": "+91-4048507745",
+      "email": "contact@tradesyndicate.in"
+    },
+    "slogan": "Experts in Complete Turnkey Project Design, Implementation, Execution & Delivering on Time",
+    "website": "https://tradesyndicate.in",
+    "socials": [],
+    "subscribe": {
+      "prompt": "Subscribe with email",
+      "action": "Send"
+    }
+  },
+  "sections": [
+    "Home",
+    "Prefabs",
+    "Hotel Essentials",
+    "Projects",
+    "Windows & Doors",
+    "Tiles",
+    "Contact-us"
+  ],
+  "core_services": [
+    "Project Design & Implementation",
+    "Prefabricated Construction",
+    "Windows & Doors Manufacturing",
+    "Tiles & Interiors",
+    "Hotel Accessories Supply",
+    "Turnkey Project Execution"
+  ],
+  "business_strategy": [
+    "Identify client needs and industry trends",
+    "Develop scalable solutions for diverse construction projects",
+    "Build strategic partnerships and collaborations for growth"
+  ],
+  "design_innovation": [
+    "Focus on sustainable and eco-friendly designs",
+    "Integrate modern technology and prefabrication methods",
+    "Offer custom designs tailored to client specifications"
+  ],
+  "execution_construction": [
+    "Ensure timely and cost-effective project delivery",
+    "Prioritize quality control and safety measures",
+    "Use skilled labor and advanced construction techniques"
+  ],
+  "client_relations": [
+    "Maintain clear communication and transparency throughout projects",
+    "Offer after-construction services and support",
+    "Build long-term client relationships through exceptional service"
+  ],
+  "subsidiaries": [
+    {
+      "name": "Trade Syndicate International Pvt. Ltd.",
+      "focus": "Our international team is committed to providing you with the best possible support and assistance in your journey to success. We strive to make our services accessible and affordable to all, regardless of your location or language.",
+      "globalPresence": [
+        "Canada",
+        "USA",
+        "China",
+        "Australia",
+        "Malaysia",
+        "Dubai",
+        "Sri Lanka",
+        "Thailand",
+        "Vietnam",
+        "Indonesia"
+      ],
+      "roles": {
+        "exports": {
+          "title": "Exports",
+          "description": "Since its establishment, the company has gained a strong reputation in the NUTS, SEEDS, SPICES, and PEANUTS industry, with consistent and reliable growth. Sourcing directly from farmers and maintaining clear communication to ensure the best quality products has been the core focus since 2013, when Mr. Suresh Arun acquired the company. The company now exports a wide range of quality products to multiple international markets. In addition to food products like PEANUTS, TURMERIC, and SPICES, the company also exports non-food items such as AIRCRAFT SPARE PARTS, ORGANIC FERTILIZERS, INDUSTRIAL HELMETS, and ELECTRICAL TRANSFORMERS. The demand for these diverse products continues to grow across various regions globally.",
+          "items": [
+            "PEANUTS",
+            "TURMERIC",
+            "SPICES",
+            "NUTS",
+            "SEEDS",
+            "CRUDE OIL",
+            "AIRCRAFT SPARE PARTS",
+            "ORGANIC FERTILIZERS",
+            "INDUSTRIAL HELMETS",
+            "ELECTRICAL TRANSFORMERS"
+          ]
+        },
+        "imports": {
+          "title": "Imports",
+          "description": "Tradesyndicate was established in the Year 2012 and it was acquired in 2013 by Mr. Suresh Arun. They both concentrated on bringing great furniture, superb tents, LED lights, show lights, decorative items, construction material, acoustics, and more from across the world. Tradesyndicate supplies its products to both trade and retail clients. We stock our material at the conversion company in order to save extra loading charges and transportation on the materials. Hence, Tradesyndicate concentrates on giving the most astounding quality, fine furniture, and extraordinary client benefits.",
+          "items": [
+            "Furniture",
+            "Tents",
+            "LED Lights",
+            "Show Lights",
+            "Decorative Items",
+            "Construction Material",
+            "Acoustics",
+            "More items as per global sourcing"
+          ]
+        }
+      },
+      "values": [
+        "Quality",
+        "Efficiency",
+        "Trust"
+      ]
+    },
+    {
+      "name": "Trade Syndicate (HYD)",
+      "focus": "Construction"
+    },
+    {
+      "name": "Suhana Beulah Hotels & Resorts",
+      "focus": "Christian resorts & exclusive venues"
+    },
+    {
+      "name": "Suhana Destinations and Travels",
+      "focus": "Holy land tours to Israel, Jordan, Palestine, Egypt, Italy"
+    },
+    {
+      "name": "APFT Aviation Pvt Ltd.",
+      "focus": "Aviation"
+    },
+    {
+      "name": "Beulah Supermarket Pvt Ltd",
+      "focus": "Retail (Coming Soon)"
+    },
+    {
+      "name": "Golden Sash IT Solutions Pvt Ltd",
+      "focus": "IT Solutions (Coming Soon)"
+    },
+    {
+      "name": "Beulah Crystalline Pvt Ltd",
+      "focus": "Coming Soon"
+    },
+    {
+      "name": "Beulah Health Services Pvt Ltd",
+      "focus": "Healthcare (Coming Soon)"
+    },
+    {
+      "name": "Suresharun SpaceX Technologies Pvt Ltd",
+      "focus": "Technology (Coming Soon)"
+    },
+    {
+      "name": "Suhana Beulah Foundation (NGO)",
+      "focus": "NGO (Coming Soon)"
+    }
+  ],
+  "pebs": {
+    "advantages": [
+      "Single Source Responsibility",
+      "Faster Installation",
+      "Economical",
+      "Maintenance-Free",
+      "Clear Spans Up to 90m",
+      "Flexibility in Expansion",
+      "Energy Efficient",
+      "Earthquake Resistant"
+    ],
+    "types": [
+      "Multi Span-3 (MS-3)",
+      "Multi Span-2 (MS-2)",
+      "Multi Span-1 (MS-1)",
+      "Clear Span (CS)",
+      "Roof System (RS)",
+      "Lean-To (LT)",
+      "Multi Gable (MG)",
+      "Single Roof (RF)"
+    ],
+    "applications": [
+      "Warehouses",
+      "Factories",
+      "Cold Storages",
+      "Offices",
+      "Schools",
+      "Hospitals",
+      "Site Offices",
+      "Gas Stations",
+      "Bus Shelters",
+      "Car Parks",
+      "Commercial Complexes",
+      "Shopping Malls",
+      "Aircraft Hangers",
+      "Sports & Recreational Facilities"
+    ],
+    "solutions": [
+      "Z - C Purlins",
+      "Decking Sheet",
+      "Anchor Bolt",
+      "Structural Sag Rods",
+      "Ridge Vent",
+      "Turbo Ventilator",
+      "Sky Light Panel",
+      "Heat Insulation Sheet",
+      "Wall Claddings",
+      "Roofing Claddings",
+      "Steel Framing"
+    ]
+  },
+  "dome_tents": {
+    "specialization": [
+      "Dome tents",
+      "Glass dome tents",
+      "Hotel tents",
+      "Customized tents",
+      "Event tents"
+    ],
+    "features": [
+      "Exclusive design-patented items",
+      "International export certifications",
+      "High durability and aesthetic appeal",
+      "Versatile outdoor and hospitality solutions"
+    ]
+  },
+  "hotel_essentials": {
+    "products": [
+      "Beddings",
+      "Cutlery",
+      "Ceramics",
+      "Glassware",
+      "Linen",
+      "Furniture"
+    ],
+    "assurance": "Only from trusted manufacturers with rigorous inspections",
+    "team": "Experienced team ensuring seamless procurement and service"
+  },
+  "aluminium_windows_doors": {
+    "products": [
+      "Sliding Doors & Windows",
+      "Hinged Windows & Doors",
+      "Curtain Wall System",
+      "Shop Fronts",
+      "Automatic Sliding Doors",
+      "Staircase & Balcony Railings",
+      "Rolling Shutters (Plane and Punch type)",
+      "Turn and Tilt Hinged Windows"
+    ],
+    "styles": [
+      "STYLE SLIDING DOOR",
+      "STYLE SIDE HUNG DOOR",
+      "CLASSIC STYLE FOLDING DOOR",
+      "STYLE THERMAL BREAK SLIDING DOOR",
+      "THERMAL BREAK SIDE HUNG DOOR",
+      "CLASSIC STYLE HUNG DOOR",
+      "SHANGRILA PRO STYLE THERMAL BREAK CASEMENT WINDOW",
+      "SHANGRILA STYLE THERMAL BREAK CASEMENT WINDOW",
+      "EASTERN SWISS PRO STYLE THERMAL CASEMENT WINDOW",
+      "EASTERN SWISS STYLE THERMAL CASEMENT WINDOW",
+      "SEINE STYLE THERMAL BREAK CASEMENT WINDOW",
+      "SEINE PRO STYLE THERMAL BREAK CASEMENT WINDOW",
+      "VICTORIA STYLE THERMAL BREAK CASEMENT WINDOW",
+      "VICTORIA PRO STYLE THERMAL BREAK CASEMENT WINDOW",
+      "COLUMBIA STYLE THERMAL BREAK CASEMENT WINDOW",
+      "COLUMBIA PRO STYLE THERMAL BREAK CASEMENT WINDOW",
+      "GREEN TIME PRO STYLE THERMAL BREAK CASEMENT WINDOW",
+      "MODER-TIME STYLE THERMAL BREAK CASEMENT WINDOW",
+      "NORDIC STYLE PRO THERMAL BREAK CASEMENT WINDOW",
+      "NORDIC STYLE THERMAL BREAK CASEMENT WINDOW",
+      "STUGGART STYLE PRO THERMAL BREAK CASEMENT WINDOW",
+      "STUGGART STYLE THERMAL BREAK CASEMENT WINDOW",
+      "FLORENCE STYLE THERMAL BREAK CASEMENT WINDOW",
+      "FLORENCE PRO STYLE THERMAL BREAK CASEMENT WINDOW",
+      "RHINE STYLE NON-THERMAL BREAK CASEMENT WINDOW",
+      "LUXEMBOURG STYLE NON-THERMAL BREAK SUN ROOM",
+      "EDINBURG STYLE NON-THERMAL BREAK SUN ROOM",
+      "EDINBURG STYLE THERMAL BREAK SUN ROOM"
+    ]
+  },
+  "tiles": {
+    "collections": [
+      "Glossy Endless Collection",
+      "Carvoss Collection",
+      "Colorplay Collection",
+      "Embossed Collection",
+      "Glazed Vitrified Tiles Carving & Endless",
+      "Glazed Vitrified Tiles Glossy",
+      "Highglass Collection",
+      "Lignea Collection",
+      "Mystic Shades",
+      "Statuario Series"
+    ],
+    "features": [
+      "Resistance to Deep Abrasion",
+      "Easy to Install",
+      "Resists Harsh Weather Conditions",
+      "Water Resistance",
+      "Resistance to Acids and Bases",
+      "Eco-friendly",
+      "Stain Resistance",
+      "Thermal Shock Resistance",
+      "Hygienic",
+      "Lightweight",
+      "Easy to Handle",
+      "Easy Cleaning",
+      "Fire Resistance"
+    ],
+    "application_areas": [
+      "Reception",
+      "Kitchen",
+      "Living Room",
+      "Salon & Spa",
+      "Offices",
+      "Restaurants & Hotels",
+      "Bathroom",
+      "Showrooms"
+    ],
+    "tile_size": "600x1200mm"
+  }
+}
