@@ -8,15 +8,22 @@ const transporter = nodemailer.createTransport({
 });
 
 // Send OTP email
-const sendOtpEmail = (toEmail, otp) => {
+const sendOtpEmail = async (toEmail, otp) => {
     const mailOptions = {
         from: process.env.EMAIL_USER,
         to: toEmail,
         subject: 'Your OTP for Email Verification',
         text: `Your OTP is: ${otp}`,
     };
-
-    return transporter.sendMail(mailOptions);
+    try {
+        console.log("Sending OTP email to:", toEmail);
+        const result = await transporter.sendMail(mailOptions);
+        console.log("Email sent successfully:", result.response);
+        return result;
+    } catch (error) {
+        console.error("❌ Email send failed:", error.message);
+        throw error;
+    }
 };
 
 
@@ -38,7 +45,6 @@ const sendSubscribeEmail = (toEmail) => {
         subject: 'Thank you for subscribing!',
         text: `Dear user,\n\nThank you for subscribing to our service. We're thrilled to have you on board!\n\nYou'll now receive our latest updates, newsletters, and more. Stay tuned!\n\nBest regards,\nThe Team`,
     };
-
     return transporter.sendMail(mailOptions);
 };
 

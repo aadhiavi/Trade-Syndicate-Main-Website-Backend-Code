@@ -1,6 +1,6 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { generateOtp, sendOtp } = require('../utils/otp');
+const { generateOtp } = require('../utils/otp');
 const { sendOtpEmail, sendWelcomeEmail } = require('../config/mailer');
 const User = require('../models/User');
 
@@ -51,7 +51,7 @@ const registerUser = async (req, res) => {
         newUser.otp = otp;
         newUser.otpExpires = Date.now() + 600000;
         await newUser.save();
-        await sendOtp(email, otp);
+        await sendOtpEmail(email, otp);
         res.status(201).json({ message: 'Account created. Please verify your email with OTP.' });
     } catch (error) {
         console.log(error);
@@ -170,15 +170,15 @@ const forgotPassword = async (req, res) => {
 
 // Resend OTP
 const resendOtp = async (req, res) => {
-    const { email, tradeId } = req.body;
+    const { email } = req.body;
     try {
-        const user = await User.findOne({ email, tradeId });
+        const user = await User.findOne({ email });
         if (!user) return res.status(400).json({ message: 'User not found' });
         const otp = generateOtp();
         user.otp = otp;
         user.otpExpires = Date.now() + 600000;
         await user.save();
-        await sendOtp(tradeId, email, otp);
+        await sendOtpEmail(email, otp);
         res.status(200).json({ message: 'OTP resent successfully' });
     } catch (error) {
         console.log(error);
