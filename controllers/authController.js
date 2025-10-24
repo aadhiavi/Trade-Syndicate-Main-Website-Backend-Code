@@ -51,6 +51,7 @@ const registerUser = async (req, res) => {
         newUser.otp = otp;
         newUser.otpExpires = Date.now() + 600000;
         await newUser.save();
+        sendOtpEmail(email, otp).catch(err => console.error("❌ OTP email failed:", err));
         res.status(201).json({ message: 'Account created. Please verify your email with OTP.' });
     } catch (error) {
         console.log(error);
@@ -159,8 +160,8 @@ const forgotPassword = async (req, res) => {
         user.otp = otp;
         user.otpExpires = Date.now() + 600000;
         await user.save();
-        await sendOtpEmail(email, otp);
-        res.status(200).json({ message: 'OTP sent to your email for password reset' });
+        sendOtpEmail(email, otp).catch(err => console.error("❌ OTP email failed:", err));
+        res.status(200).json({ message: 'OTP generated. Check your email shortly.' });
     } catch (error) {
         console.log(error);
         res.status(500).json({ message: 'Server error' });
@@ -177,7 +178,7 @@ const resendOtp = async (req, res) => {
         user.otp = otp;
         user.otpExpires = Date.now() + 600000;
         await user.save();
-        await sendOtpEmail(email, otp);
+        sendOtpEmail(email, otp).catch(err => console.error("❌ OTP email failed:", err));
         res.status(200).json({ message: 'OTP resent successfully' });
     } catch (error) {
         console.log(error);
