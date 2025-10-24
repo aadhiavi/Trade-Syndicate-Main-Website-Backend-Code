@@ -51,7 +51,7 @@ const registerUser = async (req, res) => {
         newUser.otp = otp;
         newUser.otpExpires = Date.now() + 600000;
         await newUser.save();
-        await sendOtpEmail(email, otp);
+        await sendOtpEmail(email, otp)
         res.status(201).json({ message: 'Account created. Please verify your email with OTP.' });
     } catch (error) {
         console.log(error);
