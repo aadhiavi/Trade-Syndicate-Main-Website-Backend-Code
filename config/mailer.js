@@ -11,6 +11,14 @@ const transporter = nodemailer.createTransport({
     },
 });
 
+transporter.verify((error, success) => {
+    if (error) {
+        console.error("❌ SMTP Connection Error:", error);
+    } else {
+        console.log("✅ SMTP Server is ready to send messages");
+    }
+});
+
 // Send OTP email
 const sendOtpEmail = async (toEmail, otp) => {
     const mailOptions = {
