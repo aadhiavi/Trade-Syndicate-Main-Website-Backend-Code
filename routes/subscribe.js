@@ -5,9 +5,10 @@ const router = express.Router();
 require('dotenv').config();
 
 const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 465,
-  secure: true,
+  // host: "smtp.gmail.com",
+  // port: 465,
+  // secure: true,
+  service: 'gmail',
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
