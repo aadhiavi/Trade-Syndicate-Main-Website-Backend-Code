@@ -19,7 +19,11 @@ const port = process.env.PORT || 5000;
 
 // Middleware
 app.use(bodyParser.json());
-const allowedOrigins = ['https://www.tradesyndicate.in', 'https://tradesyndicate.in'];
+const allowedOrigins = [
+  'https://www.tradesyndicate.in',
+  'https://tradesyndicate.in',
+  'http://localhost:5173',
+];
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin) return callback(null, true);
