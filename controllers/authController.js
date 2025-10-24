@@ -53,7 +53,6 @@ const registerUser = async (req, res) => {
         await newUser.save();
         await sendOtpEmail(email, otp)
         res.status(201).json({ message: 'Account created. Please verify your email with OTP.' });
-        sendOtpEmail(email, otp);
     } catch (error) {
         console.log(error);
         res.status(500).json({ message: 'Server error' });
@@ -161,8 +160,8 @@ const forgotPassword = async (req, res) => {
         user.otp = otp;
         user.otpExpires = Date.now() + 600000;
         await user.save();
+        await sendOtpEmail(email, otp);
         res.status(200).json({ message: 'OTP sent to your email for password reset' });
-        sendOtpEmail(email, otp);
     } catch (error) {
         console.log(error);
         res.status(500).json({ message: 'Server error' });
@@ -179,8 +178,8 @@ const resendOtp = async (req, res) => {
         user.otp = otp;
         user.otpExpires = Date.now() + 600000;
         await user.save();
+        await sendOtpEmail(email, otp);
         res.status(200).json({ message: 'OTP resent successfully' });
-        sendOtpEmail(email, otp);
     } catch (error) {
         console.log(error);
         res.status(500).json({ message: 'Server error' });
