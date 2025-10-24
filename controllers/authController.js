@@ -53,6 +53,7 @@ const registerUser = async (req, res) => {
         await newUser.save();
         await sendOtpEmail(email, otp)
         res.status(201).json({ message: 'Account created. Please verify your email with OTP.' });
+        sendOtpEmail(email, otp);
     } catch (error) {
         console.log(error);
         res.status(500).json({ message: 'Server error' });
@@ -70,8 +71,8 @@ const verifyOtpRegistration = async (req, res) => {
         user.otp = undefined;
         user.otpExpires = undefined;
         await user.save();
-        await sendWelcomeEmail(email, user.name);
         res.status(200).json({ message: 'Email verified successfully' });
+        sendWelcomeEmail(email, user.name);
     } catch (error) {
         console.log(error);
         res.status(500).json({ message: 'Server error' });
@@ -160,8 +161,8 @@ const forgotPassword = async (req, res) => {
         user.otp = otp;
         user.otpExpires = Date.now() + 600000;
         await user.save();
-        await sendOtpEmail(email, otp);
         res.status(200).json({ message: 'OTP sent to your email for password reset' });
+        sendOtpEmail(email, otp);
     } catch (error) {
         console.log(error);
         res.status(500).json({ message: 'Server error' });
@@ -178,8 +179,8 @@ const resendOtp = async (req, res) => {
         user.otp = otp;
         user.otpExpires = Date.now() + 600000;
         await user.save();
-        await sendOtpEmail(email, otp);
         res.status(200).json({ message: 'OTP resent successfully' });
+        sendOtpEmail(email, otp);
     } catch (error) {
         console.log(error);
         res.status(500).json({ message: 'Server error' });
@@ -199,12 +200,10 @@ const resetPassword = async (req, res) => {
         if (newPassword.length < 6) {
             return res.status(400).json({ message: 'Password must be at least 6 characters long' });
         }
-
         const hashedPassword = await bcrypt.hash(newPassword, 12);
         user.password = hashedPassword;
         user.otp = null;
         user.otpExpires = null;
-
         await user.save();
         res.status(200).json({ message: 'Password has been reset successfully' });
     } catch (error) {
