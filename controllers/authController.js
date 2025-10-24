@@ -1,6 +1,6 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { generateOtp } = require('../utils/otp');
+const { generateOtp, sendOtp } = require('../utils/otp');
 const { sendOtpEmail, sendWelcomeEmail } = require('../config/mailer');
 const User = require('../models/User');
 
@@ -160,7 +160,7 @@ const forgotPassword = async (req, res) => {
         user.otp = otp;
         user.otpExpires = Date.now() + 600000;
         await user.save();
-        sendOtpEmail(email, otp)
+        await sendOtp(email, otp)
             .then(() => console.log("✅ OTP email sent"))
             .catch(err => console.error("❌ OTP email failed:", err));
         res.status(200).json({ message: 'OTP generated. Check your email shortly.' });
