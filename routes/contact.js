@@ -1,44 +1,6 @@
+const { sendAdminEmail, sendConfirmationEmail } = require('../config/emailService');
 const Contact = require('../models/Contact');
-const nodemailer = require('nodemailer');
 require('dotenv').config();
-
-const sendAdminEmail = (formData) => {
-    const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-            user: process.env.SMTP_USER,
-            pass: process.env.SMTP_PASS,
-        },
-    });
-
-    const mailOptions = {
-        from: process.env.SMTP_USER,
-        to: process.env.ADMIN_EMAIL,
-        subject: 'New inquiry request to Trade Syndicate',
-        text: `New form submission:\n\nName: ${formData.name}\nNumber: ${formData.phone}\nEmail: ${formData.email}\nMessage: ${formData.message}`,
-    };
-
-    return transporter.sendMail(mailOptions);
-};
-
-const sendConfirmationEmail = (userEmail, formData) => {
-    const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-            user: process.env.SMTP_USER,
-            pass: process.env.SMTP_PASS,
-        },
-    });
-
-    const mailOptions = {
-        from: process.env.SMTP_USER,
-        to: userEmail,
-        subject: 'Welcome to Trade Syndicate',
-        text: `Hello ${formData.name},\n\nThank you for contacting Trade Syndicate. Your submission has been received. Please wait for a moment, and one of our team members will reach out to you shortly.\n\nBest regards,\nTrade Syndicate,\nContact: +91-4048507745\nEmail: contact@tradesyndicate.in`,
-    };
-
-    return transporter.sendMail(mailOptions);
-};
 
 const handleFormSubmission = async (req, res) => {
     try {

@@ -1,8 +1,8 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { generateOtp } = require('../utils/otp');
-const { sendOtpEmail, sendWelcomeEmail } = require('../config/mailer');
 const User = require('../models/User');
+const { sendOtpEmail, sendWelcomeEmail } = require('../config/emailService');
 
 // const adminCreateUser = async (req, res) => {
 //     const { name, email, role } = req.body;

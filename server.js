@@ -3,6 +3,8 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const fs = require('fs');
+// const { generateAuthUrl, getTokens } = require('./googleAuth');
 const contactRoutes = require('./routes/contactRoutes');
 const subscribeRoutes = require('./routes/subscribe');
 const chatbotRoute = require('./routes/chatbotRoute');
@@ -15,6 +17,7 @@ const blogcardRoutes = require('./controllers/BlogcardController');
 dotenv.config();
 const app = express();
 const path = require('path');
+const { getTokens, generateAuthUrl } = require('./googleAuth');
 const port = process.env.PORT || 5000;
 
 // Middleware
@@ -52,6 +55,25 @@ app.use('/api/starred', favouriteRoutes);
 app.use('/api/search', searchRoutes);
 app.use('/api/blogcard', blogcardRoutes);
 
+
+app.get('/auth', (req, res) => {
+  const url = generateAuthUrl();
+  res.redirect(url);
+});
+
+app.get('/oauth2callback', async (req, res) => {
+  try {
+    const code = req.query.code;
+    const tokens = await getTokens(code);
+
+    fs.writeFileSync('tokens.json', JSON.stringify(tokens, null, 2));
+    res.send('✅ Gmail tokens saved successfully. You can close this tab.');
+    console.log('✅ Gmail tokens saved:', tokens);
+  } catch (err) {
+    console.error('❌ Error getting tokens:', err.message);
+    res.status(500).send('Error while getting Gmail tokens. Check console.');
+  }
+});
 
 // MongoDB Connection
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
