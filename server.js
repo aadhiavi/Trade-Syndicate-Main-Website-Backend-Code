@@ -4,7 +4,6 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const fs = require('fs');
-// const { generateAuthUrl, getTokens } = require('./googleAuth');
 const contactRoutes = require('./routes/contactRoutes');
 const subscribeRoutes = require('./routes/subscribe');
 const chatbotRoute = require('./routes/chatbotRoute');
