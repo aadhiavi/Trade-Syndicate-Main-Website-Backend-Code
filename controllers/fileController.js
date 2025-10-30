@@ -9,26 +9,9 @@ const Folder = require('../models/Folder');
 const File = require('../models/File');
 const RecentFile = require('../models/RecentFile');
 const { isAdmin, authenticate } = require('../middleware/auth');
+const drive = require('../config/driveClient');
 
-const uploadDir = path.join(__dirname, '..', 'uploads');
-
-if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true });
-}
-
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, uploadDir);
-    },
-    filename: (req, file, cb) => {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        const ext = path.extname(file.originalname);
-        const base = path.basename(file.originalname, ext);
-        cb(null, base + '-' + uniqueSuffix + ext);
-    }
-});
-
-const upload = multer({ storage });
+const upload = multer({ dest: 'uploads/' });
 
 function formatBytes(bytes) {
     const GB = 1e9;
@@ -45,9 +28,9 @@ router.post('/upload', authenticate, isAdmin, upload.array('files'), async (req,
     try {
         const { folderId } = req.body;
         const userId = req.user.userId;
-        const MAX_STORAGE_BYTES = 30 * 1000 * 1000 * 1000; // 30 GB
+        const MAX_STORAGE_BYTES = 30 * 1000 * 1000 * 1000; // 30GB
 
-        // 1. Check if folder exists (if folderId is provided)
+        // Validate folder
         let folder = null;
         if (folderId) {
             folder = await Folder.findOne({ _id: folderId, userId });
@@ -56,46 +39,64 @@ router.post('/upload', authenticate, isAdmin, upload.array('files'), async (req,
             }
         }
 
-        // 2. Get current total storage used
+        // Check total used storage
         const agg = await File.aggregate([
-            { $match: { userId: req.user.userId, isTrashed: false } },
-            { $group: { _id: null, totalSize: { $sum: "$size" } } }
+            { $match: { userId, isTrashed: false } },
+            { $group: { _id: null, totalSize: { $sum: '$size' } } },
         ]);
-        const currentTotalSize = agg.length > 0 ? agg[0].totalSize : 0;
-
-        // 3. Sum the size of newly uploaded files
-        const newFilesSize = req.files.reduce((sum, file) => sum + file.size, 0);
+        const currentTotalSize = agg.length ? agg[0].totalSize : 0;
+        const newFilesSize = req.files.reduce((sum, f) => sum + f.size, 0);
         const totalAfterUpload = currentTotalSize + newFilesSize;
 
-        // 4. If over limit, delete uploaded files and reject
         if (totalAfterUpload > MAX_STORAGE_BYTES) {
-            // Cleanup: delete all uploaded files from disk
-            for (const file of req.files) {
-                fs.unlinkSync(file.path);
-            }
-
+            for (const f of req.files) fs.unlinkSync(f.path);
             return res.status(400).json({
                 success: false,
-                message: `Upload would exceed your 30GB storage limit. Current: ${(currentTotalSize / 1e9).toFixed(2)} GB, Attempted: ${(newFilesSize / 1e9).toFixed(2)} GB`
+                message: `Upload would exceed 30 GB limit. Current: ${(currentTotalSize / 1e9).toFixed(2)} GB`,
             });
         }
 
-        // 5. Prepare file metadata for DB
-        const filesData = req.files.map(file => ({
-            originalName: file.originalname,
-            filename: file.filename,
-            mimetype: file.mimetype,
-            size: file.size,
-            folderId: folder ? folder._id : null,
-            userId
-        }));
+        // Upload to Drive
+        const uploadedFiles = [];
+        for (const file of req.files) {
+            const fileMetadata = {
+                name: file.originalname,
+                appProperties: { userId }, // 👈 attach userId metadata
+            };
+            const media = { mimeType: file.mimetype, body: fs.createReadStream(file.path) };
 
-        // 6. Save to DB
-        const files = await File.insertMany(filesData);
+            const driveResponse = await drive.files.create({
+                resource: fileMetadata,
+                media,
+                fields: 'id, name, mimeType, webViewLink, webContentLink',
+            });
 
-        res.json({ success: true, files });
+            // Make file public
+            await drive.permissions.create({
+                fileId: driveResponse.data.id,
+                requestBody: { role: 'reader', type: 'anyone' },
+            });
+
+            fs.unlinkSync(file.path);
+
+            uploadedFiles.push({
+                originalName: file.originalname,
+                filename: driveResponse.data.id,
+                mimetype: file.mimetype,
+                size: file.size,
+                folderId: folder ? folder._id : null,
+                userId,
+                driveFileId: driveResponse.data.id,
+                driveViewLink: `https://drive.google.com/file/d/${driveResponse.data.id}/view?usp=drivesdk`,
+                driveDownloadLink: driveResponse.data.webContentLink,
+            });
+        }
+
+        const files = await File.insertMany(uploadedFiles);
+
+        res.json({ success: true, message: 'Files uploaded to Google Drive', files });
     } catch (err) {
-        console.error(err);
+        console.error('❌ Upload error:', err);
         res.status(500).json({ success: false, message: 'Server error' });
     }
 });
@@ -206,28 +207,21 @@ router.post('/recent', authenticate, isAdmin, async (req, res) => {
         if (!fileId) {
             return res.status(400).json({ success: false, message: 'Missing fileId' });
         }
-
-        // Upsert the current file as recent
         await RecentFile.findOneAndUpdate(
             { userId, fileId },
             { accessedAt: new Date() },
             { upsert: true, new: true }
         );
-
-        // Get all recent files for the user, sorted by last accessed
         const recentFiles = await RecentFile.find({ userId })
             .sort({ accessedAt: -1 })
-            .skip(5); // keep first 5, delete rest
+            .skip(5);
 
         const idsToDelete = recentFiles.map(file => file._id);
-
         if (idsToDelete.length > 0) {
             await RecentFile.deleteMany({ _id: { $in: idsToDelete } });
             console.log(`Deleted ${idsToDelete.length} old recent files`);
         }
-
         res.json({ success: true });
-
     } catch (err) {
         console.error('Error tracking recent file:', err);
         res.status(500).json({ success: false, message: 'Server error' });
@@ -237,50 +231,28 @@ router.post('/recent', authenticate, isAdmin, async (req, res) => {
 router.get('/recent', authenticate, isAdmin, async (req, res) => {
     try {
         const userId = req.user.userId;
-
         const recent = await RecentFile.find({ userId })
             .sort({ accessedAt: -1 })
             .limit(5)
             .populate('fileId');
-
         const files = recent
             .map(r => r.fileId)
             .filter(f => f !== null)
             .map(f => ({
-                id: f._id,
+                _id: f._id,
                 originalName: f.originalName,
                 filename: f.filename,
                 mimetype: f.mimetype,
                 size: f.size,
                 uploadDate: f.uploadDate,
+                driveViewLink: f.driveViewLink,
+                driveDownloadLink: f.driveDownloadLink,
+                isFavorite: f.isFavorite || false,
+                folderId: f.folderId || null
             }));
-
         res.json({ success: true, files });
     } catch (err) {
         console.error('Error fetching recent files:', err);
-        res.status(500).json({ success: false, message: 'Server error' });
-    }
-});
-
-router.get('/download/:fileId', async (req, res) => {
-    try {
-        const { fileId } = req.params;
-        const file = await File.findById(fileId);
-
-        if (!file) {
-            return res.status(404).json({ success: false, message: 'File not found' });
-        }
-
-        const filePath = path.join(uploadDir, file.filename);
-
-        if (!fs.existsSync(filePath)) {
-            return res.status(404).json({ success: false, message: 'File not found on server' });
-        }
-
-        res.download(filePath, file.originalName);
-
-    } catch (err) {
-        console.error(err);
         res.status(500).json({ success: false, message: 'Server error' });
     }
 });
@@ -334,40 +306,21 @@ router.put('/rename/:fileId', authenticate, isAdmin, async (req, res) => {
         const { fileId } = req.params;
         const { newName } = req.body;
 
-        if (!newName) {
-            return res.status(400).json({ success: false, message: 'New name is required' });
-        }
-
-        if (!mongoose.Types.ObjectId.isValid(fileId)) {
-            return res.status(400).json({ success: false, message: 'Invalid file ID' });
-        }
+        if (!newName) return res.status(400).json({ success: false, message: 'New name required' });
 
         const file = await File.findById(fileId);
-        if (!file) {
-            return res.status(404).json({ success: false, message: 'File not found' });
-        }
+        if (!file) return res.status(404).json({ success: false, message: 'File not found' });
+        if (file.userId.toString() !== req.user.userId)
+            return res.status(403).json({ success: false, message: 'Unauthorized' });
 
-        // Check file ownership
-        if (file.userId.toString() !== req.user.userId) {
-            return res.status(403).json({ success: false, message: 'Unauthorized to rename this file' });
-        }
-
-        const oldPath = path.join(uploadDir, file.filename);
-        const ext = path.extname(file.filename); // Keep original extension
-
-        // Remove extension from newName if provided, we'll add it back
-        const baseNewName = path.basename(newName, ext);
-        const timestamp = Date.now();
-        const newFilename = `${baseNewName}-${timestamp}${ext}`;
-        const newPath = path.join(uploadDir, newFilename);
-
-        // Rename the file on disk
-        fs.renameSync(oldPath, newPath);
+        // Rename on Drive
+        await drive.files.update({
+            fileId: file.driveFileId,
+            requestBody: { name: newName }
+        });
 
         // Update DB
-        file.filename = newFilename;
-        // Ensure originalName has the extension
-        file.originalName = newName.endsWith(ext) ? newName : newName + ext;
+        file.originalName = newName;
         await file.save();
 
         res.json({ success: true, message: 'File renamed successfully', file });
@@ -380,29 +333,15 @@ router.put('/rename/:fileId', authenticate, isAdmin, async (req, res) => {
 router.delete('/:fileId', authenticate, isAdmin, async (req, res) => {
     try {
         const { fileId } = req.params;
-
-        if (!mongoose.Types.ObjectId.isValid(fileId)) {
-            return res.status(400).json({ success: false, message: 'Invalid file ID' });
-        }
-
         const file = await File.findById(fileId);
-        if (!file) {
-            return res.status(404).json({ success: false, message: 'File not found' });
-        }
+        if (!file) return res.status(404).json({ success: false, message: 'File not found' });
+        if (file.userId.toString() !== req.user.userId)
+            return res.status(403).json({ success: false, message: 'Unauthorized' });
 
-        // Authorization: check if file belongs to the authenticated user
-        if (file.userId.toString() !== req.user.userId) {
-            return res.status(403).json({ success: false, message: 'Unauthorized to delete this file' });
-        }
+        // Delete from Drive
+        await drive.files.delete({ fileId: file.driveFileId });
 
-        const filePath = path.join(uploadDir, file.filename);
-
-        // Delete file from disk
-        if (fs.existsSync(filePath)) {
-            fs.unlinkSync(filePath);
-        }
-
-        // Delete file from DB
+        // Delete from DB
         await file.deleteOne();
 
         res.json({ success: true, message: 'File deleted successfully' });
@@ -429,44 +368,57 @@ router.post('/copy/:fileId', authenticate, isAdmin, async (req, res) => {
             return res.status(403).json({ success: false, message: 'Unauthorized to copy this file' });
         }
 
-        // Check destination folder (optional)
+        // Optional: check destination folder
         let folder = null;
         if (destinationFolderId) {
             folder = await Folder.findById(destinationFolderId);
             if (!folder) {
                 return res.status(400).json({ success: false, message: 'Destination folder not found' });
             }
-            // Optionally: verify folder belongs to user (if applicable)
             if (folder.userId.toString() !== userId) {
                 return res.status(403).json({ success: false, message: 'Unauthorized destination folder' });
             }
         }
 
-        const sourcePath = path.join(uploadDir, originalFile.filename);
-        const ext = path.extname(originalFile.filename);
-        const base = path.basename(originalFile.originalName, ext);
-        const newFilename = `${base}-copy-${Date.now()}${ext}`;
-        const destPath = path.join(uploadDir, newFilename);
+        // Copy file on Google Drive
+        const copyResponse = await drive.files.copy({
+            fileId: originalFile.driveFileId,
+            requestBody: {
+                name: `${originalFile.originalName}-copy`,
+                parents: folder && folder.driveFolderId ? [folder.driveFolderId] : []
+            },
+            fields: 'id, name, mimeType, webViewLink, webContentLink'
+        });
 
-        // Copy file on disk
-        fs.copyFileSync(sourcePath, destPath);
+        const copiedDriveId = copyResponse.data.id;
 
-        // Create new File document (assign to current user)
+        // Make the copied file public
+        await drive.permissions.create({
+            fileId: copiedDriveId,
+            requestBody: {
+                role: 'reader',
+                type: 'anyone'
+            }
+        });
+
+        // Save copied file info to MongoDB
         const newFile = await File.create({
-            originalName: `${base}-copy${ext}`,
-            filename: newFilename,
+            originalName: `${originalFile.originalName}-copy`,
+            filename: copiedDriveId,
             mimetype: originalFile.mimetype,
             size: originalFile.size,
             folderId: folder ? folder._id : null,
-            userId // assign ownership to current user
+            userId,
+            driveFileId: copiedDriveId,
+            driveViewLink: `https://drive.google.com/file/d/${copiedDriveId}/view?usp=drivesdk`,
+            driveDownloadLink: `https://drive.google.com/uc?id=${copiedDriveId}&export=download`
         });
 
         res.json({ success: true, message: 'File copied successfully', file: newFile });
     } catch (err) {
-        console.error(err);
+        console.error('Error copying file:', err);
         res.status(500).json({ success: false, message: 'Server error' });
     }
 });
-
 
 module.exports = router;

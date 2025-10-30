@@ -17,6 +17,7 @@ dotenv.config();
 const app = express();
 const path = require('path');
 const { getTokens, generateAuthUrl } = require('./googleAuth');
+const { getDriveTokens, generateDriveAuthUrl } = require('./driveAuth');
 const port = process.env.PORT || 5000;
 
 // Middleware
@@ -42,7 +43,7 @@ const corsOptions = {
   credentials: true,
 };
 app.use(cors(corsOptions));
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use('/api/auth', contactRoutes);
 app.use('/api/auth', subscribeRoutes);
@@ -60,17 +61,32 @@ app.get('/auth', (req, res) => {
   res.redirect(url);
 });
 
+app.get('/drive/auth', (req, res) => {
+  const url = generateDriveAuthUrl(); 
+  res.redirect(url);
+});
+
 app.get('/oauth2callback', async (req, res) => {
   try {
     const code = req.query.code;
-    const tokens = await getTokens(code);
+    const flow = req.query.state;
 
-    fs.writeFileSync('tokens.json', JSON.stringify(tokens, null, 2));
-    res.send('✅ Gmail tokens saved successfully. You can close this tab.');
-    console.log('✅ Gmail tokens saved:', tokens);
+    let tokens;
+    if (flow === 'drive') {
+      tokens = await getDriveTokens(code);
+      fs.writeFileSync('driveTokens.json', JSON.stringify(tokens, null, 2));
+      res.send('✅ Drive tokens saved successfully. You can close this tab.');
+      console.log('✅ Drive tokens saved:', tokens);
+    } else {
+      // default to Gmail
+      tokens = await getTokens(code);
+      fs.writeFileSync('tokens.json', JSON.stringify(tokens, null, 2));
+      res.send('✅ Gmail tokens saved successfully. You can close this tab.');
+      console.log('✅ Gmail tokens saved:', tokens);
+    }
   } catch (err) {
     console.error('❌ Error getting tokens:', err.message);
-    res.status(500).send('Error while getting Gmail tokens. Check console.');
+    res.status(500).send('Error while getting tokens. Check console.');
   }
 });
 
