@@ -8,7 +8,6 @@ const oAuth2Client = new google.auth.OAuth2(
   process.env.REDIRECT_URI
 );
 
-// ✅ Load tokens from environment instead of file
 if (process.env.GMAIL_TOKENS) {
   try {
     const tokens = JSON.parse(process.env.GMAIL_TOKENS);
@@ -20,14 +19,11 @@ if (process.env.GMAIL_TOKENS) {
   console.warn('⚠️ No GMAIL_TOKENS found in environment. Run googleAuth.js to generate them.');
 }
 
-// ✅ Handle token refresh
 oAuth2Client.on('tokens', (newTokens) => {
   try {
-    // Merge old + new tokens
     const oldTokens = process.env.GMAIL_TOKENS ? JSON.parse(process.env.GMAIL_TOKENS) : {};
     const updatedTokens = { ...oldTokens, ...newTokens };
 
-    // Save back into .env file
     const envPath = '.env';
     const envContent = fs.readFileSync(envPath, 'utf8');
     const newEnv = envContent.includes('GMAIL_TOKENS=')

@@ -15,7 +15,6 @@ const searchRoutes = require('./routes/search');
 const blogcardRoutes = require('./controllers/BlogcardController');
 dotenv.config();
 const app = express();
-const path = require('path');
 const { getTokens, generateAuthUrl } = require('./googleAuth');
 const { getDriveTokens, generateDriveAuthUrl } = require('./driveAuth');
 const port = process.env.PORT || 5000;
@@ -43,7 +42,6 @@ const corsOptions = {
   credentials: true,
 };
 app.use(cors(corsOptions));
-// app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use('/api/auth', contactRoutes);
 app.use('/api/auth', subscribeRoutes);
@@ -90,12 +88,10 @@ app.get('/oauth2callback', async (req, res) => {
   }
 });
 
-// MongoDB Connection
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log("MongoDB connected"))
   .catch(err => console.log(err));
 
-// Start Server
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });

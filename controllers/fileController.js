@@ -30,7 +30,6 @@ router.post('/upload', authenticate, isAdmin, upload.array('files'), async (req,
         const userId = req.user.userId;
         const MAX_STORAGE_BYTES = 30 * 1000 * 1000 * 1000; // 30GB
 
-        // Validate folder
         let folder = null;
         if (folderId) {
             folder = await Folder.findOne({ _id: folderId, userId });
@@ -39,7 +38,6 @@ router.post('/upload', authenticate, isAdmin, upload.array('files'), async (req,
             }
         }
 
-        // Check total used storage
         const agg = await File.aggregate([
             { $match: { userId, isTrashed: false } },
             { $group: { _id: null, totalSize: { $sum: '$size' } } },
@@ -61,7 +59,7 @@ router.post('/upload', authenticate, isAdmin, upload.array('files'), async (req,
         for (const file of req.files) {
             const fileMetadata = {
                 name: file.originalname,
-                appProperties: { userId }, // 👈 attach userId metadata
+                appProperties: { userId },
             };
             const media = { mimeType: file.mimetype, body: fs.createReadStream(file.path) };
 

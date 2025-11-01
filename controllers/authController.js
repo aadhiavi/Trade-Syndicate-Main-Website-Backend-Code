@@ -4,36 +4,6 @@ const { generateOtp } = require('../utils/otp');
 const User = require('../models/User');
 const { sendOtpEmail, sendWelcomeEmail } = require('../config/emailService');
 
-// const adminCreateUser = async (req, res) => {
-//     const { name, email, role } = req.body;
-
-//     try {
-//         const existingUser = await User.findOne({ email });
-//         if (existingUser) return res.status(400).json({ message: 'User already exists' });
-
-//         const tempPassword = '12345';
-//         const hashedPassword = await bcrypt.hash(tempPassword, 12);
-
-//         const user = new User({
-//             name,
-//             email,
-//             password: hashedPassword,
-//             role,
-//             temporaryPassword: hashedPassword,
-//             temporaryPasswordExpires: Date.now() + 7 * 24 * 60 * 60 * 1000
-//         });
-
-//         // Automatically set isVerified based on temporaryPassword field
-//         user.isVerified = user.temporaryPassword ? false : true;
-
-//         await user.save()
-//         res.status(201).json({ message: 'User created successfully with temp password 12345' });
-//     } catch (err) {
-//         console.error(err);
-//         res.status(500).json({ message: 'Server error' });
-//     }
-// };
-
 const registerUser = async (req, res) => {
     const { name, email, password } = req.body;
 
@@ -131,26 +101,6 @@ const loginUser = async (req, res) => {
     }
 };
 
-// const assignTemporaryPassword = async (req, res) => {
-//     const { tradeId } = req.body;
-//     try {
-//         const user = await User.findOne({ tradeId });
-//         if (!user) return res.status(404).json({ message: 'User not found' });
-
-//         try {
-//             await setTemporaryPassword(user);
-//         } catch (err) {
-//             console.error('Error in setTemporaryPassword:', err);
-//             return res.status(500).json({ message: 'Failed to set temporary password' });
-//         }
-
-//         res.status(200).json({ message: 'Temporary password "12345" has been assigned. It will expire in 24 hours.' });
-//     } catch (error) {
-//         console.log('Error in assignTemporaryPassword:', error);
-//         res.status(500).json({ message: 'Server error' });
-//     }
-// };
-
 const forgotPassword = async (req, res) => {
     const { email } = req.body;
     try {
@@ -170,7 +120,6 @@ const forgotPassword = async (req, res) => {
     }
 };
 
-// Resend OTP
 const resendOtp = async (req, res) => {
     const { email } = req.body;
     try {
@@ -188,7 +137,6 @@ const resendOtp = async (req, res) => {
     }
 };
 
-// Reset Password
 const resetPassword = async (req, res) => {
     const { email, otp, newPassword } = req.body;
     try {
@@ -213,7 +161,6 @@ const resetPassword = async (req, res) => {
     }
 };
 
-// Get User Profile
 const getUser = async (req, res) => {
     try {
         const userId = req.user.userId;
@@ -227,96 +174,6 @@ const getUser = async (req, res) => {
         res.status(500).json({ message: 'Server error' });
     }
 };
-
-// const getAllUsers = async (req, res) => {
-//     try {
-//         const users = await User.find();
-//         if (!users) {
-//             return res.status(404).json({ message: 'No users found' });
-//         }
-//         res.status(200).json(users);
-//     } catch (error) {
-//         console.log(error);
-//         res.status(500).json({ message: 'Server error' });
-//     }
-// };
-
-// const editUsers = async (req, res) => {
-//     const { name, email, tradeId, role } = req.body;
-//     const userId = req.params.id;
-//     try {
-//         const updatedUser = await User.findByIdAndUpdate(userId, { name, email, tradeId, role }, { new: true });
-//         if (!updatedUser) {
-//             return res.status(404).json({ message: 'User not found' });
-//         }
-//         res.status(200).json({ message: 'User updated successfully', updatedUser });
-//     } catch (error) {
-//         console.log(error);
-//         res.status(500).json({ message: 'Server error' });
-//     }
-// };
-
-// const isBlockedUser = async (req, res) => {
-//     const { id } = req.params;
-//     const { isBlocked } = req.body;
-//     try {
-//         const updatedUser = await User.findByIdAndUpdate(
-//             id,
-//             { isBlocked },
-//             { new: true }
-//         );
-
-//         if (!updatedUser) {
-//             return res.status(404).json({ message: 'User not found' });
-//         }
-
-//         res.status(200).json({
-//             message: `User ${isBlocked ? 'blocked' : 'unblocked'} successfully.`,
-//             updatedUser,
-//         });
-//     } catch (error) {
-//         console.error('Error updating block status:', error);
-//         res.status(500).json({ message: 'Server error' });
-//     }
-// };
-
-// Route: POST /admin/impersonate
-// const adminImpersonate = async (req, res) => {
-//     const { tradeId } = req.body;
-
-//     try {
-//         const user = await User.findOne({ tradeId });
-//         if (!user) return res.status(404).json({ message: 'User not found' });
-//         const token = jwt.sign(
-//             { userId: user._id, role: user.role },
-//             process.env.JWT_SECRET,
-//             { expiresIn: '60m' }
-//         );
-//         res.status(200).json({ token });
-//     } catch (err) {
-//         console.error(err);
-//         res.status(500).json({ message: 'Server error' });
-//     }
-// };
-
-// const deleteUser = async (req, res) => {
-//     const { id } = req.params;
-
-//     try {
-//         const user = await User.findByIdAndDelete(id);
-//         if (!user) return res.status(404).json({ message: 'User not found' });
-
-//         // Delete fixed salary records associated with the user
-//         await SalaryFixed.deleteMany({ tradeId: user.tradeId });
-
-//         res.status(200).json({ message: 'User and associated fixed salary deleted' });
-//     } catch (err) {
-//         console.error(err);
-//         res.status(500).json({ message: 'Server error' });
-//     }
-// };
-
-
 
 module.exports = {
     registerUser,

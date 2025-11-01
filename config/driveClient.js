@@ -1,4 +1,3 @@
-// config/driveClient.js
 const { google } = require('googleapis');
 const fs = require('fs');
 require('dotenv').config();
@@ -9,7 +8,6 @@ const oAuth2Client = new google.auth.OAuth2(
   process.env.REDIRECT_URI
 );
 
-// ✅ Load tokens from .env instead of driveTokens.json
 if (process.env.DRIVE_TOKENS) {
   try {
     const tokens = JSON.parse(process.env.DRIVE_TOKENS);
@@ -21,7 +19,6 @@ if (process.env.DRIVE_TOKENS) {
   console.warn('⚠️ No DRIVE_TOKENS found in environment. Run driveAuth.js to generate them.');
 }
 
-// ✅ Optional: Auto-refresh tokens and update .env
 oAuth2Client.on('tokens', (newTokens) => {
   try {
     const oldTokens = process.env.DRIVE_TOKENS ? JSON.parse(process.env.DRIVE_TOKENS) : {};

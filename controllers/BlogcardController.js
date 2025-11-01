@@ -5,7 +5,6 @@ const Blogcard = require('../models/Blogcard');
 const cloudinary = require('../config/cloudinary');
 
 const router = express.Router();
-
 const upload = multer({ storage: multer.memoryStorage() });
 
 router.post('/', upload.single('image'), async (req, res) => {

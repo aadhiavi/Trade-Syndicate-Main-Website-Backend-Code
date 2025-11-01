@@ -1,21 +1,17 @@
-// emailService.js
-const { sendEmail } = require('./gmailClient'); // Gmail client we set up
+const { sendEmail } = require('./gmailClient');
 
-// Send OTP email
 exports.sendOtpEmail = async (toEmail, otp) => {
     const subject = 'Your OTP for Email Verification';
     const text = `Your OTP is: ${otp}`;
     return sendEmail(toEmail, subject, text);
 };
 
-// Send Welcome email
 exports.sendWelcomeEmail = async (toEmail, name) => {
     const subject = 'Welcome to Trade Syndicate';
     const text = `Dear ${name},\n\nYour Trade Syndicate account has been created successfully.\n\nBest regards,\nThe Trade Syndicate Team`;
     return sendEmail(toEmail, subject, text);
 };
 
-// Send Subscription email
 exports.sendSubscribeEmail = async (email) => {
     const subject = 'Welcome to Trade Syndicate!';
     const text = `Dear Subscriber,

@@ -1,4 +1,3 @@
-// googleAuth.js
 const { google } = require('googleapis');
 require('dotenv').config();
 

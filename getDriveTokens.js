@@ -1,4 +1,3 @@
-// authDrive.js
 const { google } = require('googleapis');
 const readline = require('readline');
 const fs = require('fs');

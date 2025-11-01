@@ -3,47 +3,66 @@ const Subscribe = require('../models/Subscribe');
 const { generateOtp } = require('../utils/otp');
 const { sendOtpEmail, sendSubscribeEmail } = require('../config/emailService');
 const router = express.Router();
-require('dotenv').config();
 
 router.post('/subscribe', async (req, res) => {
   const { email } = req.body;
 
   try {
-    const existingSubscription = await Subscribe.findOne({ email });
+    let subscriber = await Subscribe.findOne({ email });
 
-    if (existingSubscription) {
+    if (subscriber && subscriber.isVerified) {
       return res.status(400).json({ message: 'This email is already subscribed!' });
     }
 
     const otp = generateOtp();
 
-    const newSubscribe = new Subscribe({ email });
-    await newSubscribe.save();
+    if (!subscriber) {
+      subscriber = new Subscribe({ email });
+    }
 
-    await sendOtpEmail(email, otp);
-    otpStore[email] = otp;
+    subscriber.otp = otp;
+    subscriber.otpExpires = Date.now() + 10 * 60 * 1000;
+    subscriber.isVerified = false;
 
-    res.status(200).json({ message: 'Email saved, OTP sent!' });
+    await subscriber.save();
+
+    sendOtpEmail(email, otp);
+
+    res.status(200).json({ message: 'OTP sent to your email!' });
   } catch (error) {
-    res.status(500).json({ message: 'Error saving contact or sending OTP', error: error.message });
+    res.status(500).json({ message: 'Error saving subscription or sending OTP', error: error.message });
   }
 });
 
 router.post('/verify-otp', async (req, res) => {
   const { email, otp } = req.body;
 
-  if (otpStore[email] === otp) {
-    delete otpStore[email];
+  try {
+    const subscriber = await Subscribe.findOne({ email });
+    if (!subscriber) return res.status(400).json({ message: 'Subscriber not found' });
 
-    try {
-      await sendSubscribeEmail(email);
-
-      res.status(200).json({ message: 'OTP verified, subscription successful! A welcome message has been sent.' });
-    } catch (error) {
-      res.status(500).json({ message: 'Error sending welcome message', error: error.message });
+    if (subscriber.isVerified) {
+      return res.status(400).json({ message: 'Already verified' });
     }
-  } else {
-    res.status(400).json({ message: 'Invalid OTP' });
+
+    if (!subscriber.otp || subscriber.otpExpires < Date.now()) {
+      return res.status(400).json({ message: 'OTP expired or invalid' });
+    }
+
+    if (subscriber.otp !== otp) {
+      return res.status(400).json({ message: 'Incorrect OTP' });
+    }
+
+    subscriber.isVerified = true;
+    subscriber.otp = undefined;
+    subscriber.otpExpires = undefined;
+    await subscriber.save();
+
+    sendSubscribeEmail(email);
+
+    res.status(200).json({ message: 'Subscription verified! Welcome email sent.' });
+  } catch (error) {
+    res.status(500).json({ message: 'Error verifying OTP', error: error.message });
   }
 });
 
@@ -54,8 +73,9 @@ router.get('/subscribe', async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: 'Error fetching subscriptions', error });
   }
-}
-)
+});
 
 module.exports = router;
+
+
 
